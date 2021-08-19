@@ -1,15 +1,15 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
+use DateTime;
+use DateTimeZone;
 use InterNations\Component\HttpMock\Expectation;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
-use PHPUnit\Framework\TestCase;
-use DateTime;
-use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -45,16 +45,16 @@ class MockBuilderIntegrationTest extends TestCase
     {
         $builder = $this->builder
             ->when()
-                ->pathIs('/foo')
-                ->methodIs($this->matches->regex('/POST/'))
-                ->callback(static function (Request $request) {
-                    error_log('CLOSURE MATCHER: ' . $request->getMethod() . ' ' . $request->getPathInfo());
-                    return true;
-                })
+            ->pathIs('/foo')
+            ->methodIs($this->matches->regex('/POST/'))
+            ->callback(static function (Request $request) {
+                error_log('CLOSURE MATCHER: ' . $request->getMethod() . ' ' . $request->getPathInfo());
+                return true;
+            })
             ->then()
-                ->statusCode(401)
-                ->body('response body')
-                ->header('X-Foo', 'Bar')
+            ->statusCode(401)
+            ->body('response body')
+            ->header('X-Foo', 'Bar')
             ->end();
 
         $this->assertSame($this->builder, $builder);
@@ -91,7 +91,7 @@ class MockBuilderIntegrationTest extends TestCase
 
         $client = $this->server->getClient();
 
-        $this->assertSame('response body', (string) $client->post('/foo')->send()->getBody());
+        $this->assertSame('response body', (string)$client->post('/foo')->getBody()->getContents());
 
         $this->assertStringContainsString('CLOSURE MATCHER: POST /foo', $this->server->getErrorOutput());
     }
@@ -100,27 +100,27 @@ class MockBuilderIntegrationTest extends TestCase
     {
         $this->builder
             ->when()
-                ->pathIs('/post-resource-1')
-                ->methodIs('POST')
+            ->pathIs('/post-resource-1')
+            ->methodIs('POST')
             ->then()
-                ->statusCode(200)
-                ->body('POST 1')
-        ->end();
+            ->statusCode(200)
+            ->body('POST 1')
+            ->end();
         $this->server->setUp($this->builder->flushExpectations());
 
         $this->builder
             ->when()
-                ->pathIs('/post-resource-2')
-                ->methodIs($this->matches->regex('/POST/'))
+            ->pathIs('/post-resource-2')
+            ->methodIs($this->matches->regex('/POST/'))
             ->then()
-                ->statusCode(200)
-                ->body('POST 2')
+            ->statusCode(200)
+            ->body('POST 2')
             ->end();
         $this->server->setUp($this->builder->flushExpectations());
 
-        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
-        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
-        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
-        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
+        $this->assertSame('POST 1', (string)$this->server->getClient()->post('/post-resource-1')->getBody());
+        $this->assertSame('POST 2', (string)$this->server->getClient()->post('/post-resource-2')->getBody());
+        $this->assertSame('POST 1', (string)$this->server->getClient()->post('/post-resource-1')->getBody());
+        $this->assertSame('POST 2', (string)$this->server->getClient()->post('/post-resource-2')->getBody());
     }
 }

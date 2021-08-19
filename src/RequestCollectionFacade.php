@@ -1,12 +1,11 @@
 <?php
+
 namespace InterNations\Component\HttpMock;
 
 use Countable;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
-use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use UnexpectedValueException;
 
@@ -14,7 +13,7 @@ class RequestCollectionFacade implements Countable
 {
     private $client;
 
-    public function __construct(ClientInterface $client)
+    public function __construct(Client $client)
     {
         $this->client = $client;
     }
@@ -49,7 +48,7 @@ class RequestCollectionFacade implements Countable
      */
     public function at($position)
     {
-       return $this->getRecordedRequest('/_request/' . $position);
+        return $this->getRecordedRequest('/_request/' . $position);
     }
 
     /**
@@ -68,18 +67,17 @@ class RequestCollectionFacade implements Countable
         return $this->deleteRecordedRequest('/_request/first');
     }
 
-    public function count()
+    public function count(): int
     {
         $response = $this->client
-            ->get('/_request/count')
-            ->send();
+            ->get('/_request/count');
 
-        return (int) $response->getBody(true);
+        return (int)$response->getBody()->getContents();
     }
 
     /**
      * @param Response $response
-     * @param string $path
+     * @param string   $path
      * @throws UnexpectedValueException
      * @return UnifiedRequest
      */
@@ -105,7 +103,7 @@ class RequestCollectionFacade implements Countable
         return new UnifiedRequest($request, $params);
     }
 
-    private function configureRequest(RequestInterface $request, array $server, array $enclosure)
+    private function configureRequest(Request $request, array $server, array $enclosure)
     {
         if (isset($server['HTTP_HOST'])) {
             $request->setHost($server['HTTP_HOST']);
@@ -135,8 +133,7 @@ class RequestCollectionFacade implements Countable
     private function getRecordedRequest($path)
     {
         $response = $this->client
-            ->get($path)
-            ->send();
+            ->get($path);
 
         return $this->parseResponse($response, $path);
     }
@@ -144,8 +141,7 @@ class RequestCollectionFacade implements Countable
     private function deleteRecordedRequest($path)
     {
         $response = $this->client
-            ->delete($path)
-            ->send();
+            ->delete($path);
 
         return $this->parseResponse($response, $path);
     }
@@ -161,7 +157,7 @@ class RequestCollectionFacade implements Countable
         }
 
         $contentType = $response->hasHeader('content-type')
-            ? $response->getContentType()
+            ? $response->getHeader('content-type')
             : '';
 
         if (substr($contentType, 0, 10) !== 'text/plain') {

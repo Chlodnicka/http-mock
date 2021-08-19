@@ -1,12 +1,12 @@
 <?php
+
 namespace InterNations\Component\HttpMock;
 
-use Guzzle\Http\Client;
-use Guzzle\Common\Event;
+use Exception;
+use GuzzleHttp\Client;
 use hmmmath\Fibonacci\FibonacciFactory;
-use Symfony\Component\Process\Process;
 use RuntimeException;
-use Guzzle\Http\Exception\CurlException;
+use Symfony\Component\Process\Process;
 
 class Server extends Process
 {
@@ -46,30 +46,31 @@ class Server extends Process
         return parent::stop($timeout, $signal);
     }
 
-    public function getClient()
+    public function getClient(): Client
     {
         return $this->client ?: $this->client = $this->createClient();
     }
 
-    private function createClient()
+    private function createClient(): Client
     {
-        $client = new Client($this->getBaseUrl());
-        $client->getEventDispatcher()->addListener(
-            'request.error',
-            static function (Event $event) {
-                $event->stopPropagation();
-            }
-        );
+        $client = new Client(['base_uri' => $this->getBaseUrl(), 'http_errors' => false]);
+//        $client->
+//        $client->getEventDispatcher()->addListener(
+//            'request.error',
+//            static function (Event $event) {
+//                $event->stopPropagation();
+//            }
+//        );
 
         return $client;
     }
 
-    public function getBaseUrl()
+    public function getBaseUrl(): string
     {
         return sprintf('http://%s', $this->getConnectionString());
     }
 
-    public function getConnectionString()
+    public function getConnectionString(): string
     {
         return sprintf('%s:%d', $this->host, $this->port);
     }
@@ -78,19 +79,20 @@ class Server extends Process
      * @param Expectation[] $expectations
      * @throws RuntimeException
      */
-    public function setUp(array $expectations)
+    public function setUp(array $expectations): void
     {
         /** @var Expectation $expectation */
         foreach ($expectations as $expectation) {
             $response = $this->getClient()->post(
                 '/_expectation',
-                null,
                 [
-                    'matcher'  => serialize($expectation->getMatcherClosures()),
-                    'limiter'  => serialize($expectation->getLimiter()),
-                    'response' => serialize($expectation->getResponse()),
+                    'form_params' => [
+                        'matcher'  => serialize($expectation->getMatcherClosures()),
+                        'limiter'  => serialize($expectation->getLimiter()),
+                        'response' => serialize($expectation->getResponse()),
+                    ]
                 ]
-            )->send();
+            );
 
             if ($response->getStatusCode() !== 201) {
                 throw new RuntimeException('Could not set up expectations');
@@ -104,17 +106,17 @@ class Server extends Process
             $this->start();
         }
 
-        $this->getClient()->delete('/_all')->send();
+        $this->getClient()->delete($this->getBaseUrl() . '/_all');
     }
 
-    private function pollWait()
+    private function pollWait(): void
     {
         foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
             try {
                 usleep($sleepTime);
-                $this->getClient()->head('/_me')->send();
+                $this->getClient()->head($this->getBaseUrl() . '/_me');
                 break;
-            } catch (CurlException $e) {
+            } catch (Exception $e) {
                 continue;
             }
         }
@@ -161,4 +163,5 @@ class Server extends Process
 
         return false;
     }
+
 }

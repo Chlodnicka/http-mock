@@ -1,28 +1,23 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Request;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
+use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
     /** @var ClientInterface|MockObject */
-    private $client;
-
-    /** @var Request */
-    private $request;
-
-    /** @var RequestCollectionFacade */
-    private $facade;
+    private ClientInterface $client;
+    private Request $request;
+    private RequestCollectionFacade $facade;
 
     public function setUp(): void
     {
-        $this->client = $this->createMock('Guzzle\Http\ClientInterface');
+        $this->client = $this->createMock(ClientInterface::class);
         $this->facade = new RequestCollectionFacade($this->client);
         $this->request = new Request('GET', '/_request/last');
         $this->request->setClient($this->client);

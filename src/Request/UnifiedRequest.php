@@ -2,14 +2,7 @@
 namespace InterNations\Component\HttpMock\Request;
 
 use BadMethodCallException;
-use Guzzle\Common\Collection;
-use Guzzle\Http\EntityBodyInterface;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
-use Guzzle\Http\Message\Header;
-use Guzzle\Http\Message\Header\HeaderCollection;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\QueryString;
-use Guzzle\Http\Url;
+use Psr\Http\Message\RequestInterface;
 
 class UnifiedRequest
 {
@@ -39,191 +32,91 @@ class UnifiedRequest
         return $this->userAgent;
     }
 
-    /**
-     * Get the body of the request if set
-     *
-     * @return EntityBodyInterface|null
-     */
     public function getBody()
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * Get a POST field from the request
-     *
-     * @param string $field Field to retrieve
-     *
-     * @return mixed|null
-     */
     public function getPostField($field)
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * Get the post fields that will be used in the request
-     *
-     * @return QueryString
-     */
     public function getPostFields()
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * Returns an associative array of POST field names to PostFileInterface objects
-     *
-     * @return array
-     */
     public function getPostFiles()
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * Get a POST file from the request
-     *
-     * @param string $fieldName POST fields to retrieve
-     *
-     * @return array|null Returns an array wrapping an array of PostFileInterface objects
-     */
+
     public function getPostFile($fieldName)
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
 
-    /**
-     * Get application and plugin specific parameters set on the message.
-     *
-     * @return Collection
-     */
     public function getParams()
     {
-        return $this->wrapped->getParams();
+        return $this->wrapped->getBody();
     }
 
-    /**
-     * Retrieve an HTTP header by name. Performs a case-insensitive search of all headers.
-     *
-     * @param string $header Header to retrieve.
-     *
-     * @return Header|null Returns NULL if no matching header is found.
-     *                     Returns a Header object if found.
-     */
     public function getHeader($header)
     {
         return $this->wrapped->getHeader($header);
     }
 
-    /**
-     * Get all headers as a collection
-     *
-     * @return HeaderCollection
-     */
     public function getHeaders()
     {
         return $this->wrapped->getHeaders();
     }
-
-    /**
-     * Get an array of message header lines
-     *
-     * @return array
-     */
     public function getHeaderLines()
     {
-        return $this->wrapped->getHeaderLines();
+        return $this->wrapped->getHeaders();
     }
 
-    /**
-     * Check if the specified header is present.
-     *
-     * @param string $header The header to check.
-     *
-     * @return boolean Returns TRUE or FALSE if the header is present
-     */
-    public function hasHeader($header)
+    public function hasHeader(string $header)
     {
         return $this->wrapped->hasHeader($header);
     }
 
-    /**
-     * Get the raw message headers as a string
-     *
-     * @return string
-     */
     public function getRawHeaders()
     {
-        return $this->wrapped->getRawHeaders();
+        return $this->wrapped->getHeaders();
     }
 
-    /**
-     * Get the collection of key value pairs that will be used as the query
-     * string in the request
-     *
-     * @return QueryString
-     */
     public function getQuery()
     {
         return $this->wrapped->getQuery();
     }
 
-    /**
-     * Get the HTTP method of the request
-     *
-     * @return string
-     */
     public function getMethod()
     {
         return $this->wrapped->getMethod();
     }
 
-    /**
-     * Get the URI scheme of the request (http, https, ftp, etc)
-     *
-     * @return string
-     */
     public function getScheme()
     {
         return $this->wrapped->getScheme();
     }
 
-    /**
-     * Get the host of the request
-     *
-     * @return string
-     */
     public function getHost()
     {
         return $this->wrapped->getHost();
     }
 
-    /**
-     * Get the HTTP protocol version of the request
-     *
-     * @return string
-     */
     public function getProtocolVersion()
     {
         return $this->wrapped->getProtocolVersion();
     }
 
-    /**
-     * Get the path of the request (e.g. '/', '/index.html')
-     *
-     * @return string
-     */
     public function getPath()
     {
         return $this->wrapped->getPath();
     }
 
-    /**
-     * Get the port that the request will be sent on if it has been set
-     *
-     * @return integer|null
-     */
     public function getPort()
     {
         return $this->wrapped->getPort();
@@ -249,36 +142,16 @@ class UnifiedRequest
         return $this->wrapped->getPassword();
     }
 
-    /**
-     * Get the full URL of the request (e.g. 'http://www.guzzle-project.com/')
-     * scheme://username:password@domain:port/path?query_string#fragment
-     *
-     * @param boolean $asObject Set to TRUE to retrieve the URL as a clone of the URL object owned by the request.
-     *
-     * @return string|Url
-     */
-    public function getUrl($asObject = false)
+    public function getUrl()
     {
-        return $this->wrapped->getUrl($asObject);
+        return $this->wrapped->getUri();
     }
 
-    /**
-     * Get an array of Cookies
-     *
-     * @return array
-     */
     public function getCookies()
     {
         return $this->wrapped->getCookies();
     }
 
-    /**
-     * Get a cookie value by name
-     *
-     * @param string $name Cookie to retrieve
-     *
-     * @return null|string
-     */
     public function getCookie($name)
     {
         return $this->wrapped->getCookie($name);

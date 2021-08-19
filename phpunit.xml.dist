@@ -26,5 +26,10 @@
         <ini name="date.timezone" value="Europe/Berlin"/>
         <const name="HTTP_MOCK_PORT" value="38080"/>
         <const name="HTTP_MOCK_HOST" value="localhost"/>
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_ENV" value="dev"/>
+        <env name="APP_SECRET" value="c97f4bf4c0318332be635e1083e95669"/>
+        <!-- ###- symfony/framework-bundle ### -->
     </php>
 </phpunit>

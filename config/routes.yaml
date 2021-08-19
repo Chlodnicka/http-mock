@@ -1,0 +1,50 @@
+index:
+    path: /
+    methods: GET
+    controller: InterNations\Component\HttpMock\Controller\IndexController::me
+
+me:
+    path: /_me
+    methods: GET
+    controller: InterNations\Component\HttpMock\Controller\IndexController::me
+
+delete:
+    path: /_all
+    methods: DELETE
+    controller: InterNations\Component\HttpMock\Controller\IndexController::delete
+
+deleteRequest:
+    path: /_request
+    methods: DELETE
+    controller: InterNations\Component\HttpMock\Controller\IndexController::deleteRequest
+
+deleteExpectations:
+    path: _expectations
+    methods: DELETE
+    controller: InterNations\Component\HttpMock\Controller\IndexController::deleteExpectations
+
+addExpectation:
+    path: _expectation
+    methods: POST
+    controller: InterNations\Component\HttpMock\Controller\IndexController::addExpectation
+
+countRequests:
+    path: /_request/count
+    methods: GET
+    controller: InterNations\Component\HttpMock\Controller\IndexController::countRequests
+
+getRequest:
+    path: /_request/{index}
+    methods: GET
+    controller: InterNations\Component\HttpMock\Controller\IndexController::getRequest
+
+deleteRequestAction:
+    path: /_request/{action}
+    methods: DELETE
+    controller: InterNations\Component\HttpMock\Controller\IndexController::deleteRequestAction
+
+getRequestAction:
+    path: /_request/{action}
+    methods: GET
+    controller: InterNations\Component\HttpMock\Controller\IndexController::getRequestAction
+
